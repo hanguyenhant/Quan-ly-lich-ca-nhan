@@ -7,6 +7,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.border.TitledBorder;
 import javax.swing.text.DateFormatter;
 import javax.swing.JTextField;
@@ -19,10 +20,22 @@ import javax.swing.JSpinner;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import org.jdesktop.swingx.JXDatePicker;
+
+import javafx.scene.web.PromptData;
+import javazoom.jl.decoder.JavaLayerException;
+import javazoom.jl.player.Player;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 public class DatLich extends JFrame {
 
@@ -31,13 +44,26 @@ public class DatLich extends JFrame {
 	 */
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
-	private JTextField textField;
-	private JTextField textField_1;
+	private JTextField name;
+	private JTextField sound;
+	private JTextArea content;
+	private JXDatePicker start_day;
+	private JXDatePicker end_day;
+	private JSpinner start_time;
+	private JSpinner end_time;
+	private JRadioButton rdbtnYes;
+	private JRadioButton rdbtnYes1;
+	private JRadioButton rdbtnNo;
+	private JRadioButton rdbtnNo1;
+	private JComboBox prompt_before;
+	private JComboBox priority;
+	private ColorChooserButton color;
 	private JTextField textField_2;
 	private JTextField textField_3;
 	private JTextField textField_4;
 	private JTextField textField_5;
-
+	private Lich lich;
+	JButton btnOk;
 	/**
 	 * Launch the application.
 	 */
@@ -58,7 +84,8 @@ public class DatLich extends JFrame {
 	 * Create the frame.
 	 */
 	public DatLich() {
-		//setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//		connectMySQL();
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 500, 514);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -80,14 +107,14 @@ public class DatLich extends JFrame {
 		lblTnCngVic.setBounds(10, 24, 97, 14);
 		panel.add(lblTnCngVic);
 		
-		textField = new JTextField();
-		textField.setBounds(148, 21, 292, 20);
-		panel.add(textField);
-		textField.setColumns(10);
+		name = new JTextField();
+		name.setBounds(148, 21, 292, 20);
+		panel.add(name);
+		name.setColumns(10);
 		
-		JTextArea textArea = new JTextArea();
-		textArea.setBounds(148, 56, 292, 84);
-		panel.add(textArea);
+		content = new JTextArea();
+		content.setBounds(148, 56, 292, 84);
+		panel.add(content);
 		
 		JLabel lblThiGianBt = new JLabel("Thời gian bắt đầu");
 		lblThiGianBt.setBounds(10, 164, 107, 14);
@@ -98,55 +125,55 @@ public class DatLich extends JFrame {
 		panel.add(lblThiGianKt);
 		
 //		Chon ngay bat dau
-		JXDatePicker picker_1 = new JXDatePicker();
-		picker_1.setDate(Calendar.getInstance().getTime());
-		picker_1.setFormats(new SimpleDateFormat("dd.MM.yyyy"));
-		picker_1.setBounds(148, 161, 110, 20);
-        panel.add(picker_1);
+		start_day = new JXDatePicker();
+		start_day.setDate(Calendar.getInstance().getTime());
+		start_day.setFormats(new SimpleDateFormat("dd.MM.yyyy"));
+		start_day.setBounds(148, 161, 110, 20);
+        panel.add(start_day);
 
 		
 //		Chon gio bat dau
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 24); // 24 == 12 PM == 00:00:00
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
+        Calendar time = Calendar.getInstance();
+        time.set(Calendar.HOUR_OF_DAY, 24); // 24 == 12 PM == 00:00:00
+        time.set(Calendar.MINUTE, 0);
+        time.set(Calendar.SECOND, 0);
 
         SpinnerDateModel model_1 = new SpinnerDateModel();
-        model_1.setValue(calendar.getTime());
+        model_1.setValue(time.getTime());
 
-        JSpinner spinner_1 = new JSpinner(model_1);
+        start_time = new JSpinner(model_1);
 
-        JSpinner.DateEditor editor_1 = new JSpinner.DateEditor(spinner_1, "HH:mm:ss");
+        JSpinner.DateEditor editor_1 = new JSpinner.DateEditor(start_time, "HH:mm:ss");
         DateFormatter formatter_1 = (DateFormatter)editor_1.getTextField().getFormatter();
         formatter_1.setAllowsInvalid(false); // this makes what you want
         formatter_1.setOverwriteMode(true);
 
-        spinner_1.setEditor(editor_1);
-        spinner_1.setBounds(307, 161, 86, 20);
-		panel.add(spinner_1);      
+        start_time.setEditor(editor_1);
+        start_time.setBounds(307, 161, 86, 20);
+		panel.add(start_time);      
 		
 //        Chon ngay ket thuc
-		JXDatePicker picker_2 = new JXDatePicker();
-		picker_2.setDate(Calendar.getInstance().getTime());
-		picker_2.setFormats(new SimpleDateFormat("dd.MM.yyyy"));
-		picker_2.setBounds(148, 192, 110, 20);
-        panel.add(picker_2);
+		end_day = new JXDatePicker();
+		end_day.setDate(Calendar.getInstance().getTime());
+		end_day.setFormats(new SimpleDateFormat("dd.MM.yyyy"));
+		end_day.setBounds(148, 192, 110, 20);
+        panel.add(end_day);
 		
 //		Chon gio ket thuc
         
         SpinnerDateModel model_2 = new SpinnerDateModel();
-        model_2.setValue(calendar.getTime());
+        model_2.setValue(time.getTime());
 
-        JSpinner spinner_2 = new JSpinner(model_2);
+        end_time = new JSpinner(model_2);
         
-        JSpinner.DateEditor editor_2 = new JSpinner.DateEditor(spinner_2, "HH:mm:ss");
+        JSpinner.DateEditor editor_2 = new JSpinner.DateEditor(end_time, "HH:mm:ss");
         DateFormatter formatter_2 = (DateFormatter)editor_2.getTextField().getFormatter();
         formatter_2.setAllowsInvalid(false); // this makes what you want
         formatter_2.setOverwriteMode(true);
 
-        spinner_2.setEditor(editor_2);
-        spinner_2.setBounds(307, 192, 86, 20);
-		panel.add(spinner_2); 
+        end_time.setEditor(editor_2);
+        end_time.setBounds(307, 192, 86, 20);
+		panel.add(end_time); 
 		
 		JPanel panel_1 = new JPanel();
 		panel_1.setBorder(new TitledBorder(null, "Option", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -158,16 +185,16 @@ public class DatLich extends JFrame {
 		lblNewLabel.setBounds(10, 26, 72, 14);
 		panel_1.add(lblNewLabel);
 		
-		JComboBox comboBox = new JComboBox();
-		comboBox.setBounds(147, 23, 52, 20);
-		comboBox.addItem(1);
-		comboBox.addItem(2);
-		comboBox.addItem(3);
-		comboBox.addItem(4);
-		comboBox.addItem(5);
+		priority = new JComboBox();
+		priority.setBounds(147, 23, 52, 20);
+		priority.addItem(1);
+		priority.addItem(2);
+		priority.addItem(3);
+		priority.addItem(4);
+		priority.addItem(5);
 		
 		
-		panel_1.add(comboBox);
+		panel_1.add(priority);
 		
 		JLabel lblNhcNh = new JLabel("Nhắc nhở");
 		lblNhcNh.setBounds(262, 26, 75, 14);
@@ -178,13 +205,13 @@ public class DatLich extends JFrame {
 		
 		ButtonGroup buttonGroup = new ButtonGroup();
 
-		JRadioButton rdbtnYes = new JRadioButton("Yes");
+		rdbtnYes = new JRadioButton("Yes");
 		rdbtnYes.setBounds(343, 22, 52, 23);
 		rdbtnYes.setSelected(true);
 		buttonGroup.add(rdbtnYes);
 		panel_1.add(rdbtnYes);
 		
-		JRadioButton rdbtnNo = new JRadioButton("No");
+		rdbtnNo = new JRadioButton("No");
 		rdbtnNo.setBounds(397, 22, 61, 23);
 		buttonGroup.add(rdbtnNo);		
 		panel_1.add(rdbtnNo);	
@@ -197,76 +224,139 @@ public class DatLich extends JFrame {
 		lblLpLi.setBounds(262, 61, 46, 14);
 		panel_1.add(lblLpLi);
 		
-		JComboBox comboBox_1 = new JComboBox();
-		comboBox_1.setBounds(147, 58, 89, 20);
-		comboBox_1.addItem("Không");
-		comboBox_1.addItem("5 minute");
-		comboBox_1.addItem("10 minute");
-		comboBox_1.addItem("15 minute");
+		ButtonGroup buttonGroup1 = new ButtonGroup();
+
+		rdbtnYes1 = new JRadioButton("Yes");
+		rdbtnYes1.setBounds(343, 55, 52, 30);
+		rdbtnYes1.setSelected(true);
+		buttonGroup1.add(rdbtnYes1);
+		panel_1.add(rdbtnYes1);
 		
-		panel_1.add(comboBox_1);
+		rdbtnNo1 = new JRadioButton("No");
+		rdbtnNo1.setBounds(397, 55, 52, 30);
+		buttonGroup1.add(rdbtnNo1);		
+		panel_1.add(rdbtnNo1);	
+		
+		prompt_before = new JComboBox();
+		prompt_before.setBounds(147, 58, 89, 20);
+		prompt_before.addItem("Không");
+		prompt_before.addItem("5 minute");
+		prompt_before.addItem("10 minute");
+		prompt_before.addItem("15 minute");
+		
+		panel_1.add(prompt_before);
 		
 		JLabel lblmBo = new JLabel("Âm báo");
 		lblmBo.setBounds(10, 101, 46, 14);
 		panel_1.add(lblmBo);
 		
-		textField_1 = new JTextField();
-		textField_1.setBounds(147, 98, 189, 20);
-		panel_1.add(textField_1);
-		textField_1.setColumns(10);
+		sound = new JTextField();
+		sound.setBounds(147, 98, 189, 20);
+		panel_1.add(sound);
+		sound.setColumns(10);
 		
 		//Chon file am thanh bao 
 		JButton btnBrowse = new JButton("Browse");
 		btnBrowse.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JFrame frame = new JFrame("File Browser");
-
-	            JFileChooser fileChooser = new JFileChooser(".");
-	            fileChooser.setControlButtonsAreShown(false);
-	            frame.getContentPane().add(fileChooser, BorderLayout.CENTER);
-
-	            ActionListener actionListener = new ActionListener() {
-	                public void actionPerformed(ActionEvent actionEvent) {
-	                    JFileChooser theFileChooser = (JFileChooser) actionEvent
-	                            .getSource();
-	                    String command = actionEvent.getActionCommand();
-	                    if (command.equals(JFileChooser.APPROVE_SELECTION)) {
-	                        File selectedFile = theFileChooser
-	                                .getSelectedFile();
-	                        System.out.println(selectedFile.getParent());
-	                        System.out.println(selectedFile.getName());
-	                    } else if (command
-	                            .equals(JFileChooser.CANCEL_SELECTION)) {
-	                        System.out.println(JFileChooser.CANCEL_SELECTION);
-	                    }
-	                }
-	            };
-	            fileChooser.addActionListener(actionListener);
-	            frame.pack();
-	            frame.setVisible(true);
+	            JFileChooser fileChooser = new JFileChooser();
+	            fileChooser.setControlButtonsAreShown(true);
+	            int choose = fileChooser.showOpenDialog(null);
+	            //Neu chon Open thi lay duong dan cua file day vao textFiled_1
+	            if (choose == fileChooser.APPROVE_OPTION) {
+	            	File f = fileChooser.getSelectedFile();
+	            	String path = f.getPath();
+	            	sound.setText(path);
+	            }
 			}
 		});
 		btnBrowse.setBounds(346, 97, 89, 23);
 		panel_1.add(btnBrowse);
 		
-
-
-		
-		
 		JLabel lblMu = new JLabel("Màu");
 		lblMu.setBounds(10, 140, 46, 14);
 		panel_1.add(lblMu);
 		
-		ColorChooserButton btnChooseColor = new ColorChooserButton(Color.PINK);
-		btnChooseColor.setBounds(147, 136, 89, 23);
-		panel_1.add(btnChooseColor);
+		color = new ColorChooserButton(Color.PINK);
+		color.setBounds(147, 136, 89, 23);
+		panel_1.add(color);
 		
-		JButton btnNewButton = new JButton("OK");
-		btnNewButton.setBounds(258, 447, 89, 23);
-		contentPane.add(btnNewButton);
+		btnOk = new JButton("OK");
+		btnOk.setBounds(258, 447, 89, 23);
+		contentPane.add(btnOk);
+		
 		
 		JButton btnCancel = new JButton("Cancel");
 		btnCancel.setBounds(137, 447, 89, 23);
 		contentPane.add(btnCancel);
+		
+		btnCancel.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				setVisible(false);
+			}
+		});
 	}
+	public JButton getOk() {
+		return btnOk;
+	}
+	
+	public String getName() {
+		return name.getText();
+	}
+	 
+	public String getSound() {
+		return sound.getText();
+	}
+	
+	public String getContent() {
+		return content.getText();
+	}
+	
+	public JXDatePicker getStart_day() {
+		return start_day;
+	}
+	
+	public JXDatePicker getEnd_day() {
+		return end_day;
+	}
+	
+	public JSpinner getStart_time() {
+		return start_time;
+	}
+	
+	public JSpinner getEnd_time() {
+		return end_time;
+	}
+	
+	public JRadioButton getRdbtnYes() {
+		return rdbtnYes;
+	}
+	
+	public JRadioButton getRdbtnNo() {
+		return rdbtnNo;
+	}
+	
+	public JRadioButton getRdbtnYes1() {
+		return rdbtnYes1;
+	}
+	
+	public JRadioButton getRdbtnNo1() {
+		return rdbtnNo1;
+	}
+	
+	public JComboBox getPrompt_before() {
+		return prompt_before;
+	}
+	
+	public JComboBox getPriority() {
+		return priority;
+	}
+	
+	public ColorChooserButton getColor() {
+		return color;
+	}
+	
+//	public Connection getConnect() {
+//		return connect;
+//	}
 }
