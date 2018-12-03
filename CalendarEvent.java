@@ -7,17 +7,18 @@ public class CalendarEvent {
     private static final Color DEFAULT_COLOR = Color.PINK;
     private Lich lich = new Lich();
     private LocalDate date;
+    private LocalDate end_date;
     private LocalTime start;
     private LocalTime end;
     private String text;
     private Color color;
     private int id;
 
-    public CalendarEvent(int id, Lich lich, LocalDate date, LocalTime start, LocalTime end, String text) {
-        this(id, lich, date, start, end, text, DEFAULT_COLOR);
+    public CalendarEvent(int id, Lich lich, LocalDate date, LocalTime start, LocalTime end, String text, LocalDate end_date) {
+        this(id, lich, date, start, end, text, DEFAULT_COLOR, end_date);
     }
 
-    public CalendarEvent(int id, Lich lich, LocalDate date, LocalTime start, LocalTime end, String text, Color color) {
+    public CalendarEvent(int id, Lich lich, LocalDate date, LocalTime start, LocalTime end, String text, Color color, LocalDate end_date) {
     	this.id = id;
     	this.lich = lich;
         this.date = date;
@@ -25,6 +26,11 @@ public class CalendarEvent {
         this.end = end;
         this.text = text;
         this.color = color;
+        this.end_date = end_date;
+    }
+    
+    public LocalDate getEnd_date() {
+    	return end_date;
     }
 
     public int getId() {

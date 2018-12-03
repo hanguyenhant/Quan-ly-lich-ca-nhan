@@ -71,191 +71,110 @@ public abstract class Calendar extends JComponent {
 			@Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-	            //Lay su kien tuong ung
-	            CalendarEvent event = checkCalendarEventClick(e.getPoint());
-	            PreparedStatement s;
-	            connection = new ConnectMySQL();
-       		 	connect = ConnectMySQL.connectMySQL();
                 //Kiem tra neu la chuot phai duoc click
-                if ((e.getModifiers() & InputEvent.BUTTON3_MASK) == InputEvent.BUTTON3_MASK) {
-                	 int selection = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn xóa?", "Xóa lịch", JOptionPane.OK_CANCEL_OPTION);
-                	//Xu ly su kien neu dong y xoa
-                	//Xoa su kien khoi CSDL
-                	 if (selection == JOptionPane.OK_OPTION) {
-                		 try {
-							s = connect.prepareStatement("delete from lich where id = ?");
-							s.setInt(1, event.getId());
-							int ret = s.executeUpdate();
-							if (ret > 0) {
-								JOptionPane.showMessageDialog(null, "Xóa thành công", "Xóa lịch", JOptionPane.INFORMATION_MESSAGE);
-								events.remove(event);
-							}
-							else {
-								JOptionPane.showMessageDialog(null, "Lỗi", "Xóa lịch", JOptionPane.INFORMATION_MESSAGE);
-							}
-                		 } catch (SQLException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-                		 
-                	 }
-                }
-                else {
-	                //Kiem tra co nam trong su kien nao khong
-	                if (checkCalendarEventClick (e.getPoint()) != null) {
-	                	//Tao doi tuong luu du lieu cua su kien event
-	                	DatLich datlich = new DatLich();
-	                	datlich.setTitle("Sửa lịch");
-	                	
-	                	//Xet cac gia tri cua su kien vao form datlich
-	                	datlich.setName(event.getLich().getName());
-	                	datlich.setContent(event.getLich().getContent());
-	                	
-	                	//Lay mau sac cua su kien
-	                	String c =event.getLich().getColor();
-	    				Scanner sc = new Scanner(c);
-	    			    sc.useDelimiter("\\D+");
-	    			    Color color = new Color(sc.nextInt(), sc.nextInt(), sc.nextInt());
-	                	datlich.getColor().setSelectedColor(color);
-	                	
-	                	//Date and time
-	                	Date d = new Date();
-	                	Date d1 = new Date();
-	                	SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	    				try {
-							d = format.parse(event.getLich().getStart_time());
-							d1 = format.parse(event.getLich().getEnd_time());
-						} catch (ParseException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-	    				datlich.getStart_day().setDate(d);
-	    				datlich.getEnd_day().setDate(d1);
-	    				datlich.getStart_time().setValue(d);
-	    				datlich.getEnd_time().setValue(d1);
-	    				
-	    				//Chuong bao
-	                	datlich.setSound(event.getLich().getSound());
-	                	
-	                	//Che do nhac truoc cua su kien
-	                	if (event.getLich().getPrompt().compareTo("Yes") == 0) {
-	                		datlich.getRdbtnYes().setSelected(true);
-	                	}
-	                	else datlich.getRdbtnNo().setSelected(true);
-	                	
-	                	//Che do lap lai cua su kien
-	                	if (event.getLich().getRepeat().compareTo("Yes") == 0) {
-	                		datlich.getRdbtnYes1().setSelected(true);
-	                	}
-	                	else datlich.getRdbtnNo1().setSelected(true);
-	                	
-	                	datlich.setVisible(true);
-	                	
-	                	//Xu ly su kien ok (luu thay doi)
-	                	datlich.getOk().addActionListener(new ActionListener() {
-	                		public void actionPerformed(ActionEvent e) {
-	                			Lich lich = new Lich();
-	                			//Ten cong viec
-	                			lich.setName(datlich.getName());
-	                			
-	                			//Noi dung cong viec
-	                			lich.setContent(datlich.getContent());
-	                			
-	                			//Chuyen dinh dang cua ngay thang nam va thoi gian bat dau, ket thuc lich
-	                			SimpleDateFormat formater = new SimpleDateFormat("yyyy-MM-dd");
-	                			SimpleDateFormat formater1 = new SimpleDateFormat("HH:mm:ss");
-	                			
-	                			//Thoi gian bat dau
-	                			String day = formater.format(datlich.getStart_day().getDate());
-	                			String time1 = formater1.format(datlich.getStart_time().getValue());
-	                			day += " " + time1;
-	                			lich.setStart_time(day);
-	                			
-	                			//Thoi gian ket thuc
-	                			day = formater.format(datlich.getEnd_day().getDate());
-	                			time1 = formater1.format(datlich.getEnd_time().getValue());
-	                			day += " " + time1;
-	                			lich.setEnd_time(day);
-	                			
-	                			//Do uu tien cua su kien
-	                			lich.setPriority((int)datlich.getPriority().getSelectedItem());
-	                			
-	                			//Kiem tra che do nhac nho
-	                			if (datlich.getRdbtnYes().isSelected()) {
-	                				lich.setPrompt("Yes");
-	                			}
-	                			else lich.setPrompt("No");
-	                			
-	                			//Kiem tra che do Lap lai
-	                			if (datlich.getRdbtnYes1().isSelected()) {
-	                				lich.setRepeat("Yes");
-	                			}
-	                			else lich.setRepeat("No");
-	                			
-	                			//Che do nhac truoc
-	                			lich.setPrompt_before(datlich.getPrompt_before().getSelectedItem().toString());
-	                			
-	                			//Chuong bao
-	                			lich.setSound(datlich.getSound());
-	                			
-	                			//Mau cua su kien
-	                			lich.setColor(datlich.getColor().getSelectedColor().toString());
-	                			System.out.println(lich.getName());
-	                			System.out.println(lich.getContent());
-	                			System.out.println(lich.getStart_time());
-	                			System.out.println(lich.getEnd_time());
-	                			System.out.println(lich.getPriority());
-	                			System.out.println(lich.getPrompt());
-	                			System.out.println(lich.getRepeat());
-	                			System.out.println(lich.getPrompt_before());
-	                			System.out.println(lich.getSound());
-	                			System.out.println(lich.getColor());
-	                			System.out.println(lich.getStatus());
-	                			System.out.println(event.getId());
-	                			try {
-	    							PreparedStatement s = connect.prepareStatement("update lich set name = ?, content = ?, start_time = ?, end_time = ?, priority = ?, status = ?, prompt = ?, isrepeat = ?, prompt_before = ?, color = ?, sound = ? where id = ?");
-	    							s.setString(1, lich.getName());
-	    							s.setString(2, lich.getContent());
-	    							s.setString(3, lich.getStart_time());
-	    							s.setString(4, lich.getEnd_time());
-	    							s.setInt(5, lich.getPriority());
-	    							s.setString(6, "Chưa hoàn thành");
-	    							s.setString(7, lich.getPrompt());
-	    							s.setString(8, lich.getRepeat());
-	    							s.setString(9, lich.getPrompt_before());
-	    							s.setString(10, lich.getColor());
-	    							s.setString(11, lich.getSound());
-	    							s.setInt(12, event.getId());
-	    							int res = s.executeUpdate();
-	    							
-	    							if (res > 0) {
-	    								JOptionPane.showMessageDialog(null, "Sửa thông tin thành công");
-	    								//Lay thong tin ve ngay bat dau, thoi gian bat dau, thoi gian ket thuc, color de ve
-	    								Date d = datlich.getStart_day().getDate();
-	    								Date d1 = (Date)datlich.getStart_time().getValue();
-	    								Date d2 = (Date)datlich.getEnd_time().getValue();
-	    								
-	    								//Mau su kien
-	    								String c =lich.getColor();
-	    								Scanner sc = new Scanner(c);
-	    							    sc.useDelimiter("\\D+");
-	    							    Color color = new Color(sc.nextInt(), sc.nextInt(), sc.nextInt());
-	    								
-	    							    CalendarEvent event1 = new CalendarEvent(event.getId(), lich, LocalDate.of(d.getYear() + 1900, d.getMonth() + 1, d.getDate()), 
-	    										LocalTime.of(d1.getHours(), d1.getMinutes()), LocalTime.of(d2.getHours(), d2.getMinutes()), lich.getContent(), color);
-	    							    events.remove(event);
-	    							    events.add(event1);
-	    								datlich.setVisible(false);
+	            if (checkCalendarEventClick (e.getPoint()) != null) {
+	            	//Lay su kien tuong ung
+		            CalendarEvent event = checkCalendarEventClick(e.getPoint());
+	            	if ((e.getModifiers() & InputEvent.BUTTON3_MASK) == InputEvent.BUTTON3_MASK) {
+	                	JPopupMenu menu = new JPopupMenu();
+	                	JMenuItem xoa = new JMenuItem("Xóa");
+	                	menu.add(xoa);
+	                	menu.show(e.getComponent(), e.getPoint().x, e.getPoint().y);
+	                	xoa.addActionListener(new ActionListener() {
+	                		public void actionPerformed(ActionEvent e1) {
+	    	                	int selection = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn xóa?", "Xóa lịch", JOptionPane.OK_CANCEL_OPTION);
+	    	                	//Xu ly su kien neu dong y xoa
+	    	                	//Xoa su kien khoi CSDL
+	    	                	if (selection == JOptionPane.OK_OPTION) {
+	    	                		connection = new ConnectMySQL();
+	    	                		connect = ConnectMySQL.connectMySQL();
+	    	                		try {
+	    	                			PreparedStatement s = connect.prepareStatement("delete from lich where id = ?");
+	    	                			s.setInt(1, event.getId());
+	    	                			int ret = s.executeUpdate();
+	    	                			if (ret > 0) {
+	    									JOptionPane.showMessageDialog(null, "Xóa thành công", "Xóa lịch", JOptionPane.INFORMATION_MESSAGE);
+	    									events.remove(event);
+	    									repaint();
+	    								}
+	    								else {
+	    									JOptionPane.showMessageDialog(null, "Lỗi", "Xóa lịch", JOptionPane.INFORMATION_MESSAGE);
+	    								}
+	    		            		} catch (SQLException e2) {
+	    								// TODO Auto-generated catch block
+	    		            			e2.printStackTrace();
 	    							}
-	    	                	} catch (SQLException e1) {
-	    							// TODO Auto-generated catch block
-	    							e1.printStackTrace();
-	    						}
+	    		                		 
+	    		                }
 	                		}
 	                	});
-	                	 
 	                }
-                }
+	            	else {
+		                //Kiem tra co nam trong su kien nao khong
+		                if (checkCalendarEventClick (e.getPoint()) != null) {
+		                	//Tao doi tuong luu du lieu cua su kien event
+		                	DatLich datlich = new DatLich();
+		                	datlich.setTitle("Sửa lịch");
+		                	
+		                	//Xet cac gia tri cua su kien vao form datlich
+		                	datlich.setName(event.getLich().getName());
+		                	datlich.setContent(event.getLich().getContent());
+		                	
+		                	//Lay mau sac cua su kien
+		                	String c =event.getLich().getColor();
+		    				Scanner sc = new Scanner(c);
+		    			    sc.useDelimiter("\\D+");
+		    			    Color color = new Color(sc.nextInt(), sc.nextInt(), sc.nextInt());
+		                	datlich.getColor().setSelectedColor(color);
+		                	
+		                	//Date and time
+		                	Date d = new Date();
+		                	Date d1 = new Date();
+		                	SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		    				try {
+								d = format.parse(event.getLich().getStart_time());
+								d1 = format.parse(event.getLich().getEnd_time());
+							} catch (ParseException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+		    				datlich.getStart_day().setDate(d);
+		    				datlich.getEnd_day().setDate(d1);
+		    				datlich.getStart_time().setValue(d);
+		    				datlich.getEnd_time().setValue(d1);
+		    				
+		    				//Chuong bao
+		                	datlich.setSound(event.getLich().getSound());
+		                	
+		                	//Che do nhac truoc cua su kien
+		                	if (event.getLich().getPrompt().compareTo("Yes") == 0) {
+		                		datlich.getRdbtnYes().setSelected(true);
+		                	}
+		                	else datlich.getRdbtnNo().setSelected(true);
+		                	
+		                	//Che do lap lai cua su kien
+		                	if (event.getLich().getRepeat().compareTo("Yes") == 0) {
+		                		datlich.getRdbtnYes1().setSelected(true);
+		                	}
+		                	else datlich.getRdbtnNo1().setSelected(true);
+		                	
+		                	datlich.setVisible(true);
+		                	
+		                	//Xu ly su kien ok (luu thay doi)
+		                	datlich.getOk().addActionListener(new ActionListener() {
+		                		public void actionPerformed(ActionEvent e) {
+		                			datlich.getXuLyOk(e, event);
+		                			CalendarEvent newEvent = datlich.getEvent();
+		                			events.remove(event);
+		                			events.add(newEvent);
+		                			repaint();
+		                			datlich.setVisible(false);
+		                		}
+		                	});
+		                	 
+		                }
+	                }
+	            }       
             }
         });
     }

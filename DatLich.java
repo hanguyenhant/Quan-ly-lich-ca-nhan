@@ -90,8 +90,6 @@ public class DatLich extends JFrame {
 	 * Create the frame.
 	 */
 	public DatLich() {
-//		connectMySQL();
-		//setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 500, 514);
 		setTitle("Đặt lịch");
 		contentPane = new JPanel();
@@ -400,7 +398,7 @@ public class DatLich extends JFrame {
 		return event;
 	}
 	
-	public void getXuLyOk(ActionEvent e) {
+	public void getXuLyOk(ActionEvent e, CalendarEvent event1) {
 		ConnectMySQL connection = new ConnectMySQL();
 	    Connection connect = connection.connectMySQL();
 	    Lich lich = new Lich();
@@ -451,10 +449,15 @@ public class DatLich extends JFrame {
 		lich.setColor(getColor().getSelectedColor().toString());
 	 
 		//Them thong tin cua lich vao CSDL
-		PreparedStatement s;
+		PreparedStatement s = null;
 		try {
-			 
-			s = connect.prepareStatement("insert into lich (`name`, `content`, `start_time`, `end_time`, `priority`, `status`, `prompt`, `isrepeat`, `prompt_before`, `color`, `sound`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"); 
+			if (getTitle().compareTo("Đặt lịch") == 0) {
+				s = connect.prepareStatement("insert into lich (`name`, `content`, `start_time`, `end_time`, `priority`, `status`, `prompt`, `isrepeat`, `prompt_before`, `color`, `sound`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"); 
+			}
+			else {
+				s = connect.prepareStatement("update lich set name = ?, content = ?, start_time = ?, end_time = ?, priority = ?, status = ?, prompt = ?, isrepeat = ?, prompt_before = ?, color = ?, sound = ? where id = ?");
+				s.setInt(12, event1.getId());
+			}
 			s.setString(1, lich.getName());
 			s.setString(2, lich.getContent());
 			s.setString(3, lich.getStart_time());
@@ -467,20 +470,27 @@ public class DatLich extends JFrame {
 			s.setString(10, lich.getColor());
 			s.setString(11, lich.getSound());
 			int res = s.executeUpdate();
+			int id = 0;
 			if (res > 0) {
-				JOptionPane.showMessageDialog(null, "Thêm thông tin thành công");
-				
-				//Lay id cua su kien phuc vu qua trinh xoa su kien
-				s = connect.prepareStatement("select max(id) from lich");
-				ResultSet set = s.executeQuery();
-				int id = 0;
-				while (set.next()) {
-					System.out.println(Integer.parseInt(set.getString(1)));
-					id = Integer.parseInt(set.getString(1));
+				if (getTitle().compareTo("Đặt lịch") == 0) {
+					JOptionPane.showMessageDialog(null, "Thêm thông tin thành công");
+					
+					//Lay id cua su kien phuc vu qua trinh xoa su kien
+					s = connect.prepareStatement("select max(id) from lich");
+					ResultSet set = s.executeQuery();
+					while (set.next()) {
+						System.out.println(Integer.parseInt(set.getString(1)));
+						id = Integer.parseInt(set.getString(1));
+					}
+				}
+				else {
+					JOptionPane.showMessageDialog(null, "Sửa thông tin thành công");
+					id = event1.getId();
 				}
 				 
 				//Lay thong tin ve ngay bat dau, thoi gian bat dau, thoi gian ket thuc, color de ve
 				Date d = getStart_day().getDate();
+				Date ed = getEnd_day().getDate();
 				Date d1 = (Date)getStart_time().getValue();
 				Date d2 = (Date)getEnd_time().getValue();
 				
@@ -491,7 +501,7 @@ public class DatLich extends JFrame {
 			    Color color = new Color(sc.nextInt(), sc.nextInt(), sc.nextInt());
 				
 			    event = new CalendarEvent(id, lich, LocalDate.of(d.getYear() + 1900, d.getMonth() + 1, d.getDate()), 
-						LocalTime.of(d1.getHours(), d1.getMinutes()), LocalTime.of(d2.getHours(), d2.getMinutes()), lich.getContent(), color);
+						LocalTime.of(d1.getHours(), d1.getMinutes()), LocalTime.of(d2.getHours(), d2.getMinutes()), lich.getContent(), color,LocalDate.of(ed.getYear() + 1900, ed.getMonth() + 1, ed.getDate()));
 			    
 			    //Dong giao dien dat lich
 			    setVisible(false);
@@ -506,7 +516,4 @@ public class DatLich extends JFrame {
 			e2.printStackTrace();
 		}
 	}
-//	public Connection getConnect() {
-//		return connect;
-//	}
 }
