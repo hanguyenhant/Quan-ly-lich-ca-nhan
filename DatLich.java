@@ -28,6 +28,7 @@ import javafx.scene.web.PromptData;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.EventObject;
@@ -70,6 +71,8 @@ public class DatLich extends JFrame {
 	private Lich lich;
 	private JButton btnOk;
 	private CalendarEvent  event;
+	private ArrayList<CalendarEvent> arrEvent = new ArrayList<CalendarEvent>(); //Mang chua cac su kien cua lich nhieu ngay
+	
 	/**
 	 * Launch the application.
 	 */
@@ -398,6 +401,10 @@ public class DatLich extends JFrame {
 		return event;
 	}
 	
+	public ArrayList<CalendarEvent> getArrEvent() {
+		return arrEvent;
+	}
+	
 	public void getXuLyOk(ActionEvent e, CalendarEvent event1) {
 		ConnectMySQL connection = new ConnectMySQL();
 	    Connection connect = connection.connectMySQL();
@@ -479,7 +486,6 @@ public class DatLich extends JFrame {
 					s = connect.prepareStatement("select max(id) from lich");
 					ResultSet set = s.executeQuery();
 					while (set.next()) {
-						System.out.println(Integer.parseInt(set.getString(1)));
 						id = Integer.parseInt(set.getString(1));
 					}
 				}
@@ -514,6 +520,49 @@ public class DatLich extends JFrame {
 		} catch (SQLException e2) {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
+		}
+	}
+	
+	//Ve su kien cua them, sua lich
+	public void paintEvent(WeekCalendar cal, CalendarEvent event) {
+		//Tinh khoang cach giua 2 thoi gian (bat dau va ket thuc dat lich)
+		int time = event.getEnd_date().compareTo(event.getDate());
+		int i;
+		//Cung 1 ngay, ve 1 su kien
+		if (time == 0) {
+			if (getTitle().compareTo("Đặt lịch") == 0) cal.addEvent(event);
+			arrEvent.add(event);
+		}
+		//Cach nhau 1 ngay, ve 2 su kien
+		else if (time == 1) {
+			CalendarEvent event1 = new CalendarEvent(event.getId(), event.getLich(), event.getDate(), event.getStart(), LocalTime.of(23, 0, 0), event.getText(), event.getColor(), event.getDate());
+		 
+			CalendarEvent event2 = new CalendarEvent(event.getId(), event.getLich(), event.getEnd_date(), LocalTime.of(0, 0, 0), event.getEnd(), event.getText(), event.getColor(), event.getEnd_date());
+			if (getTitle().compareTo("Đặt lịch") == 0) cal.addEvent(event1);
+			if (getTitle().compareTo("Đặt lịch") == 0) cal.addEvent(event2);
+			arrEvent.add(event1);
+			arrEvent.add(event2);
+		}
+		//Cach nhau > 1 ngay
+		else {
+			//Ve thoi gian bat dau den het ngay 
+			CalendarEvent event1 = new CalendarEvent(event.getId(), event.getLich(), event.getDate(), event.getStart(), LocalTime.of(23, 0, 0), event.getText(), event.getColor(), event.getDate());
+			if (getTitle().compareTo("Đặt lịch") == 0) cal.addEvent(event1);
+			LocalDate date = event.getDate();
+			arrEvent.add(event1);
+			
+			//Ve ca ngay
+			for (i = 0 ; i < (time - 1); i++) {
+				date = date.plusDays(1);
+				event1 = new CalendarEvent(event.getId(), event.getLich(), date, LocalTime.of(0, 0, 0), LocalTime.of(23, 0, 0), event.getText(), event.getColor(), date);
+				if (getTitle().compareTo("Đặt lịch") == 0) cal.addEvent(event1);
+				arrEvent.add(event1);
+			}
+			
+			//Ve thoi gian tu 0:0:0 den thoi gian ket thuc
+			event1 = new CalendarEvent(event.getId(), event.getLich(), event.getEnd_date(), LocalTime.of(0, 0, 0), event.getEnd(), event.getText(), event.getColor(), event.getEnd_date());
+			if (getTitle().compareTo("Đặt lịch") == 0) cal.addEvent(event1);
+			arrEvent.add(event1);
 		}
 	}
 }

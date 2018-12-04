@@ -32,6 +32,10 @@ public class CalendarEvent {
     public LocalDate getEnd_date() {
     	return end_date;
     }
+    
+    public void setEnd_date(LocalDate date) {
+    	this.end_date = date;
+    }
 
     public int getId() {
     	return id;

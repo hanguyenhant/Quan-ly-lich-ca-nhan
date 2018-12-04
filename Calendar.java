@@ -94,7 +94,17 @@ public abstract class Calendar extends JComponent {
 	    	                			int ret = s.executeUpdate();
 	    	                			if (ret > 0) {
 	    									JOptionPane.showMessageDialog(null, "Xóa thành công", "Xóa lịch", JOptionPane.INFORMATION_MESSAGE);
-	    									events.remove(event);
+	    									int i;
+	    									
+	    									int n = events.size();
+	    									//Vi nhieu ngay, nen can kiem tra cac khu vuc cung id voi khu vuc muon xoa
+	    									for (i = 0; i < n; i++) {
+	    										if (events.get(i).getId() == event.getId()) {
+	    											events.remove(events.get(i));
+	    											i--;
+	    											n--;
+	    										}
+	    									}
 	    									repaint();
 	    								}
 	    								else {
@@ -165,8 +175,26 @@ public abstract class Calendar extends JComponent {
 		                		public void actionPerformed(ActionEvent e) {
 		                			datlich.getXuLyOk(e, event);
 		                			CalendarEvent newEvent = datlich.getEvent();
-		                			events.remove(event);
-		                			events.add(newEvent);
+		                			int i;
+		                			
+		                			int n = events.size();
+									//Xoa toan bo thong tin lich cu
+									for (i = 0; i < n; i++) {
+										if (events.get(i).getId() == event.getId()) {
+											events.remove(events.get(i));
+											i--;
+											n--;
+										}
+									}
+									
+									//Tim cac event cua lich moi sua
+		                			datlich.paintEvent(null, newEvent);
+		                			ArrayList<CalendarEvent> arrEvent = datlich.getArrEvent();
+		                			for (i = 0; i < arrEvent.size(); i++) {
+		                				events.add(arrEvent.get(i));
+		                			}
+ 
+		                			//Ve lai lich 
 		                			repaint();
 		                			datlich.setVisible(false);
 		                		}

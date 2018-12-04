@@ -26,23 +26,6 @@ public class WeekCalendarTest {
 	private static JButton datLich = new JButton("New");
 	private static JFrame frm;
 	private static WeekCalendar cal;
-//	private static Connection connect = null;
-//	private final static String className="com.mysql.jdbc.Driver";
-//	private final static String url="jdbc:mysql://localhost:3306/baitaplon";
-//	
-//	//Ket noi toi mysql
-//  	private static void connectMySQL() {
-//  		
-//  		try {
-//  			Class.forName(className);
-//  			connect=DriverManager.getConnection(url, "root", "123456");
-//  			System.out.println("Kết nối thành công!\n");
-//  		} catch (SQLException e) {
-//  			System.out.println("Không tìm thấy class");
-//  		} catch (ClassNotFoundException e) {
-//  			System.out.println("Lỗi kết nối");
-//  		}
-//  	}
 	
 	public WeekCalendarTest(ArrayList<CalendarEvent> events) {
 		frm = new JFrame();
@@ -142,7 +125,21 @@ public class WeekCalendarTest {
         			public void actionPerformed(ActionEvent e1) {
         				dl.getXuLyOk(e1, null);
         				CalendarEvent event = dl.getEvent();
-        				cal.addEvent(event);
+//        				Date start_date = new Date();
+//        				Date end_date = new Date();
+//        				start_date.setDate(event.getDate().getDayOfMonth());
+//        				start_date.setMonth(event.getDate().getMonthValue());
+//        				start_date.setYear(event.getDate().getYear());
+//        				end_date.setDate(event.getEnd_date().getDayOfMonth());
+//        				end_date.setMonth(event.getEnd_date().getMonthValue());
+//        				end_date.setYear(event.getEnd_date().getYear());
+//        				
+//        				//Tinh khoang cach giua 2 thoi gian (bat dau va ket thuc dat lich)
+//        				int time = (int) ((end_date.getTime() - start_date.getTime())/1000/60/60/24);
+        				
+        				//Ve su kien 
+        				dl.paintEvent(cal, event);
+        				 
         			}
         			
         		});
