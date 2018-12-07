@@ -40,6 +40,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import javax.swing.JScrollPane;
 
 public class DatLich extends JFrame {
 
@@ -61,8 +62,7 @@ public class DatLich extends JFrame {
 	private JRadioButton rdbtnYes1;
 	private JRadioButton rdbtnNo;
 	private JRadioButton rdbtnNo1;
-	private JComboBox prompt_before;
-	private JComboBox<Integer> priority;
+	private JComboBox<String> prompt_before;
 	private ColorChooserButton color;
 	private JTextField textField_2;
 	private JTextField textField_3;
@@ -121,8 +121,12 @@ public class DatLich extends JFrame {
 		name.setColumns(10);
 		
 		content = new JTextArea();
-		content.setBounds(148, 56, 292, 84);
-		panel.add(content);
+		
+		JScrollPane scrollpane = new JScrollPane(content);
+		scrollpane.setBounds(148, 56, 292, 84);
+		panel.add(scrollpane);
+//		content.setBounds(148, 56, 292, 84);
+//		panel.add(content);
 		
 		JLabel lblThiGianBt = new JLabel("Thời gian bắt đầu");
 		lblThiGianBt.setBounds(10, 164, 107, 14);
@@ -181,7 +185,7 @@ public class DatLich extends JFrame {
 
         end_time.setEditor(editor_2);
         end_time.setBounds(307, 192, 86, 20);
-		panel.add(end_time); 
+		panel.add(end_time);
 		
 		JPanel panel_1 = new JPanel();
 		panel_1.setBorder(new TitledBorder(null, "Option", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -189,23 +193,8 @@ public class DatLich extends JFrame {
 		contentPane.add(panel_1);
 		panel_1.setLayout(null);
 		
-		JLabel lblNewLabel = new JLabel("Độ ưu tiên");
-		lblNewLabel.setBounds(10, 26, 72, 14);
-		panel_1.add(lblNewLabel);
-		
-		priority = new JComboBox<Integer>();
-		priority.setBounds(147, 23, 52, 20);
-		priority.addItem(1);
-		priority.addItem(2);
-		priority.addItem(3);
-		priority.addItem(4);
-		priority.addItem(5);
-	//	priority.setSelectedIndex(0);
-		
-		panel_1.add(priority);
-		
 		JLabel lblNhcNh = new JLabel("Nhắc nhở");
-		lblNhcNh.setBounds(262, 26, 75, 14);
+		lblNhcNh.setBounds(10, 26, 75, 14);
 		panel_1.add(lblNhcNh);
 		
 		//Nhac nho chon Yes or No
@@ -214,43 +203,38 @@ public class DatLich extends JFrame {
 		buttonGroup = new ButtonGroup();
 
 		rdbtnYes = new JRadioButton("Yes");
-		rdbtnYes.setBounds(343, 22, 52, 23);
+		rdbtnYes.addActionListener(new ActionListener() 
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				prompt_before.setEnabled(true);
+			}
+		});
+		rdbtnYes.setBounds(147, 22, 52, 23);
 		rdbtnYes.setSelected(true);
 		buttonGroup.add(rdbtnYes);
 		panel_1.add(rdbtnYes);
 		
 		rdbtnNo = new JRadioButton("No");
-		rdbtnNo.setBounds(397, 22, 61, 23);
+		rdbtnNo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				prompt_before.setEnabled(false);				
+			}
+		});
+		rdbtnNo.setBounds(201, 22, 61, 23);
 		buttonGroup.add(rdbtnNo);		
-		panel_1.add(rdbtnNo);	
+		panel_1.add(rdbtnNo);
 		
 		JLabel lblThiGianNhc = new JLabel("Thời gian nhắc trước");
 		lblThiGianNhc.setBounds(10, 61, 135, 14);
-		panel_1.add(lblThiGianNhc);
+		panel_1.add(lblThiGianNhc);	
 		
-		JLabel lblLpLi = new JLabel("Lặp lại");
-		lblLpLi.setBounds(262, 61, 46, 14);
-		panel_1.add(lblLpLi);
-		
-		buttonGroup1 = new ButtonGroup();
-
-		rdbtnYes1 = new JRadioButton("Yes");
-		rdbtnYes1.setBounds(343, 55, 52, 30);
-		rdbtnYes1.setSelected(true);
-		buttonGroup1.add(rdbtnYes1);
-		panel_1.add(rdbtnYes1);
-		
-		rdbtnNo1 = new JRadioButton("No");
-		rdbtnNo1.setBounds(397, 55, 52, 30);
-		buttonGroup1.add(rdbtnNo1);		
-		panel_1.add(rdbtnNo1);	
-		
-		prompt_before = new JComboBox();
+		prompt_before = new JComboBox<String>();
 		prompt_before.setBounds(147, 58, 89, 20);
 		prompt_before.addItem("Không");
-		prompt_before.addItem("5 minute");
-		prompt_before.addItem("10 minute");
-		prompt_before.addItem("15 minute");
+		prompt_before.addItem("5 phút");
+		prompt_before.addItem("10 phút");
+		prompt_before.addItem("15 phút");
 		
 		panel_1.add(prompt_before);
 		
@@ -280,16 +264,6 @@ public class DatLich extends JFrame {
 	            	File f = fileChooser.getSelectedFile();
 	            	String path = f.getPath();
 	            	sound.setText(path);
-//	            	try {
-//						Player player = new Player(new FileInputStream(sound.getText()));
-//						player.play();
-//					} catch (FileNotFoundException e1) {
-//						// TODO Auto-generated catch block
-//						e1.printStackTrace();
-//					} catch (JavaLayerException e1) {
-//						// TODO Auto-generated catch block
-//						e1.printStackTrace();
-//					}
 	            }
 			}
 		});
@@ -377,14 +351,14 @@ public class DatLich extends JFrame {
 		return rdbtnNo1;
 	}
 	
-	public JComboBox getPrompt_before() {
+	public JComboBox<String> getPrompt_before() {
 		return prompt_before;
 	}
-	
-	public JComboBox getPriority() {
-		return priority;
-	}
-	
+//	
+//	public JComboBox getPriority() {
+//		return priority;
+//	}
+//	
 	public ColorChooserButton getColor() {
 		return color;
 	}
@@ -429,10 +403,7 @@ public class DatLich extends JFrame {
 		day = formater.format(getEnd_day().getDate());
 		time1 = formater1.format(getEnd_time().getValue());
 		day += " " + time1;
-		lich.setEnd_time(day);
-		
-		//Do uu tien cua su kien
-		lich.setPriority((int)getPriority().getSelectedItem());
+		lich.setEnd_time(day);		
 		
 		//Kiem tra che do nhac nho
 		if (getRdbtnYes().isSelected()) {
@@ -440,14 +411,17 @@ public class DatLich extends JFrame {
 		}
 		else lich.setPrompt("No");
 		
-		//Kiem tra che do Lap lai
-		if (getRdbtnYes1().isSelected()) {
-			lich.setRepeat("Yes");
-		}
-		else lich.setRepeat("No");
-		
 		//Che do nhac truoc
-		lich.setPrompt_before(getPrompt_before().getSelectedItem().toString());
+		//Luu vao co so du lieu: Khong -> 00 phut ; 5 -> 05 phut
+		if (getPrompt_before().getSelectedItem().toString().equals("Không"))
+			lich.setPrompt_before("00 phút");
+		else if (getPrompt_before().getSelectedItem().toString().equals("5 phút"))
+			lich.setPrompt_before("05 phút");		
+		else lich.setPrompt_before(getPrompt_before().getSelectedItem().toString());
+		
+		if (getPromptGroup().getSelection().toString().equals("No"))
+			lich.setPrompt_before(null);
+			
 		
 		//Chuong bao
 		lich.setSound(getSound());
@@ -459,23 +433,21 @@ public class DatLich extends JFrame {
 		PreparedStatement s = null;
 		try {
 			if (getTitle().compareTo("Đặt lịch") == 0) {
-				s = connect.prepareStatement("insert into lich (`name`, `content`, `start_time`, `end_time`, `priority`, `status`, `prompt`, `isrepeat`, `prompt_before`, `color`, `sound`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"); 
+				s = connect.prepareStatement("insert into lich (`name`, `content`, `start_time`, `end_time`, `status`, `prompt`, `prompt_before`, `color`, `sound`) values (?, ?, ?, ?, ?, ?, ?, ?, ?)"); 
 			}
 			else {
-				s = connect.prepareStatement("update lich set name = ?, content = ?, start_time = ?, end_time = ?, priority = ?, status = ?, prompt = ?, isrepeat = ?, prompt_before = ?, color = ?, sound = ? where id = ?");
-				s.setInt(12, event1.getId());
+				s = connect.prepareStatement("update lich set name = ?, content = ?, start_time = ?, end_time = ?, status = ?, prompt = ?, prompt_before = ?, color = ?, sound = ? where id = ?");
+				s.setInt(10, event1.getId());
 			}
 			s.setString(1, lich.getName());
 			s.setString(2, lich.getContent());
 			s.setString(3, lich.getStart_time());
 			s.setString(4, lich.getEnd_time());
-			s.setInt(5, lich.getPriority());
-			s.setString(6, "Chưa hoàn thành");
-			s.setString(7, lich.getPrompt());
-			s.setString(8, lich.getRepeat());
-			s.setString(9, lich.getPrompt_before());
-			s.setString(10, lich.getColor());
-			s.setString(11, lich.getSound());
+			s.setString(5, "Chưa hoàn thành");
+			s.setString(6, lich.getPrompt());
+			s.setString(7, lich.getPrompt_before());
+			s.setString(8, lich.getColor());
+			s.setString(9, lich.getSound());
 			int res = s.executeUpdate();
 			int id = 0;
 			if (res > 0) {
@@ -535,7 +507,7 @@ public class DatLich extends JFrame {
 		}
 		//Cach nhau 1 ngay, ve 2 su kien
 		else if (time == 1) {
-			CalendarEvent event1 = new CalendarEvent(event.getId(), event.getLich(), event.getDate(), event.getStart(), LocalTime.of(23, 0, 0), event.getText(), event.getColor(), event.getDate());
+			CalendarEvent event1 = new CalendarEvent(event.getId(), event.getLich(), event.getDate(), event.getStart(), LocalTime.of(23, 59, 59), event.getText(), event.getColor(), event.getDate());
 		 
 			CalendarEvent event2 = new CalendarEvent(event.getId(), event.getLich(), event.getEnd_date(), LocalTime.of(0, 0, 0), event.getEnd(), event.getText(), event.getColor(), event.getEnd_date());
 			if (getTitle().compareTo("Đặt lịch") == 0) cal.addEvent(event1);
@@ -546,7 +518,7 @@ public class DatLich extends JFrame {
 		//Cach nhau > 1 ngay
 		else {
 			//Ve thoi gian bat dau den het ngay 
-			CalendarEvent event1 = new CalendarEvent(event.getId(), event.getLich(), event.getDate(), event.getStart(), LocalTime.of(23, 0, 0), event.getText(), event.getColor(), event.getDate());
+			CalendarEvent event1 = new CalendarEvent(event.getId(), event.getLich(), event.getDate(), event.getStart(), LocalTime.of(23, 59, 59), event.getText(), event.getColor(), event.getDate());
 			if (getTitle().compareTo("Đặt lịch") == 0) cal.addEvent(event1);
 			LocalDate date = event.getDate();
 			arrEvent.add(event1);
@@ -554,7 +526,7 @@ public class DatLich extends JFrame {
 			//Ve ca ngay
 			for (i = 0 ; i < (time - 1); i++) {
 				date = date.plusDays(1);
-				event1 = new CalendarEvent(event.getId(), event.getLich(), date, LocalTime.of(0, 0, 0), LocalTime.of(23, 0, 0), event.getText(), event.getColor(), date);
+				event1 = new CalendarEvent(event.getId(), event.getLich(), date, LocalTime.of(0, 0, 0), LocalTime.of(23, 59, 59), event.getText(), event.getColor(), date);
 				if (getTitle().compareTo("Đặt lịch") == 0) cal.addEvent(event1);
 				arrEvent.add(event1);
 			}

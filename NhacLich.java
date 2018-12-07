@@ -33,7 +33,9 @@ public class NhacLich {
 								        		"		start_time, \r\n" + 
 								        		"		INTERVAL CONCAT(substr(prompt_before,1,2),':00')\r\n" + 
 								        		"		MINUTE_SECOND\r\n" + 
-								        		"	)>now();");
+								        		"	)>now()\r\n" +
+								        		"and prompt != 'No';");
+		        
 		        while (rs.next()) {
 		            LichHen lichhen = new LichHen();
 
